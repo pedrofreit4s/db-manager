@@ -11,6 +11,12 @@ export default class DatabasesController {
     const { authorization } = request.headers()
     const { name, userId } = request.body()
 
+    if (!name || !userId)
+      return response.conflict({
+        code: 401,
+        message: 'Informe todos os campos!',
+      })
+
     if (!authorization)
       return response.unauthorized({
         code: 401,
@@ -47,13 +53,17 @@ export default class DatabasesController {
       user_id: decrypt.user.id,
     })
 
-    await Database.rawQuery(`CREATE DATABASE ${name};`)
-    await Database.rawQuery(
-      `GRANT ALL PRIVILEGES ON ${name}.* TO '${dbUser.username}'@'%' WITH GRANT OPTION; `
-    )
-    await Database.rawQuery(`FLUSH PRIVILEGES;`)
+    try {
+      await Database.rawQuery(`CREATE DATABASE ${name};`)
+      await Database.rawQuery(
+        `GRANT ALL PRIVILEGES ON ${name}.* TO '${dbUser.username}'@'%' WITH GRANT OPTION; `
+      )
+      await Database.rawQuery(`FLUSH PRIVILEGES;`)
 
-    return response.created(db)
+      return response.created(db)
+    } catch (error) {
+      console.log(error)
+    }
   }
   public async list({ request, response }: HttpContextContract) {
     const { authorization } = request.headers()
@@ -68,11 +78,34 @@ export default class DatabasesController {
       Env.get('JWT_SECRET')
     )
 
-    const databases = await Database.query() // :point_left: gives an instance of select query builder
-      .from('databases')
+    const databases = await Database.from('database_users as a').innerJoin(
+      'databases as b',
+      'a.id',
+      'b.user_db_id'
+    )
+
+    return databases
+  }
+
+  public async listUsers({ request, response }: HttpContextContract) {
+    const { authorization } = request.headers()
+
+    if (!authorization)
+      return response.unauthorized({
+        code: 401,
+        message: 'Invalid bearer token',
+      })
+    const decrypt: any = jwt.verify(
+      authorization.split(' ')[1],
+      Env.get('JWT_SECRET')
+    )
+
+    const users = await Database.query()
+      .from('database_users')
       .where('user_id', decrypt.user.id)
       .select('*')
-    return databases
+
+    return users
   }
   public async createUser({ request, response }: HttpContextContract) {
     const { authorization } = request.headers()

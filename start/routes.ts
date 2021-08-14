@@ -34,6 +34,7 @@ Route.group(() => {
       Route.get('/', 'DatabasesController.list')
       Route.post('/', 'DatabasesController.store')
 
+      Route.get('/users', 'DatabasesController.listUsers')
       Route.post('/users', 'DatabasesController.createUser')
       Route.delete('/users/:id', 'DatabasesController.deleteUser')
     }).prefix('/database')
