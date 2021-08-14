@@ -31,6 +31,7 @@ Route.group(() => {
       Route.get('/recover', 'AccountsController.recover')
     }).prefix('/account')
     Route.group(() => {
+      Route.get('/', 'DatabasesController.list')
       Route.post('/', 'DatabasesController.store')
 
       Route.post('/users', 'DatabasesController.createUser')

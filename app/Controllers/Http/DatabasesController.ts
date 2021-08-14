@@ -55,6 +55,25 @@ export default class DatabasesController {
 
     return response.created(db)
   }
+  public async list({ request, response }: HttpContextContract) {
+    const { authorization } = request.headers()
+
+    if (!authorization)
+      return response.unauthorized({
+        code: 401,
+        message: 'Invalid bearer token',
+      })
+    const decrypt: any = jwt.verify(
+      authorization.split(' ')[1],
+      Env.get('JWT_SECRET')
+    )
+
+    const databases = await Database.query() // :point_left: gives an instance of select query builder
+      .from('databases')
+      .where('user_id', decrypt.user.id)
+      .select('*')
+    return databases
+  }
   public async createUser({ request, response }: HttpContextContract) {
     const { authorization } = request.headers()
 

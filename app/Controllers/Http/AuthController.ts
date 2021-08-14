@@ -66,13 +66,14 @@ export default class AuthController {
     if (!user.active)
       return response.status(403).json({
         code: 403,
-        message: 'Sua conta não foi ativada ainda!',
+        message: 'Sua conta não foi ativada ainda',
       })
 
-    if (!Hash.verify(user.password, body.password))
+    console.log(await Hash.verify(user.password, body.password))
+    if (!(await Hash.verify(user.password, body.password)))
       return response.status(400).json({
         code: 400,
-        message: 'Esse e-mail já foi cadastrado no nosso sistema',
+        message: 'Sua senha está incorreta',
       })
 
     const token = jwt.sign({ user }, Env.get('JWT_SECRET'))
