@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: dbmanager-postgres
+    environment:
+      POSTGRES_USER: dbmanager
+      POSTGRES_PASSWORD: dbmanager
+      POSTGRES_DB: dbmanager
+    ports:
+      - "5432:5432"
+    volumes:
+      - .docker/postgres:/var/lib/postgresql/data
