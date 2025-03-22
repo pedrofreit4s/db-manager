@@ -4,6 +4,7 @@ import (
 	"github.com/pedrofreit4s/db-manager/internal/config"
 	"github.com/pedrofreit4s/db-manager/internal/database"
 	"github.com/pedrofreit4s/db-manager/internal/http"
+	"github.com/pedrofreit4s/db-manager/internal/template"
 )
 
 func main() {
@@ -12,6 +13,9 @@ func main() {
 	// Database
 	database.Connect()
 	defer database.Close()
+
+	// Template
+	template.Init("./web")
 
 	// HTTP Server
 	http.StartServer()
