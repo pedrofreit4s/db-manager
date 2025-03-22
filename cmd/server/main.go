@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"github.com/pedrofreit4s/db-manager/internal/config"
+)
 
 func main() {
-	fmt.Println("Oi")
+	config.LoadEnviroment()
 }
